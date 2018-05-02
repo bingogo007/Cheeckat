@@ -209,4 +209,11 @@ public class WalletServiceImpl implements WalletService {
          }
     }
 
+    @Override
+    public int addNewUser(Long user_id) {
+        Wallet wallet = new Wallet();
+        wallet.setUser_id(user_id);
+        return walletDao.addLocal(wallet);
+    }
+
 }

@@ -86,7 +86,7 @@ public class MissionServiceImpl implements MissionService{
 
 	@Override
 	public List<Map<String,Object>> getAllMissionLimit(int start,int count) {
-		List<Map<String,Object>> list = missionDao.listBySql("select a.*,b.head_img,b.birth,b.user_name,b.sex as user_sex,b.country,b.invisible from tb_mission a,tb_user b where a.publish_id = b.user_id and a.status=0 and a.to = 0 order by money desc limit "+start+","+count);
+		List<Map<String,Object>> list = missionDao.listBySql("select a.*,b.head_img,b.birth,b.user_name,b.sex as user_sex,b.country,b.invisible from tb_mission a,tb_user b where a.publish_id = b.user_id and a.status=0 and a.to_type = 0 order by money desc limit "+start+","+count);
 //		WherePrams where = new WherePrams();
 //		where.and("status", C.EQ, 0);
 //		where.and("to_user", C.EQ, 0);
@@ -98,7 +98,7 @@ public class MissionServiceImpl implements MissionService{
 
 	@Override
 	public List<Map<String,Object>> getMyMission(Long userId) {
-		List<Map<String,Object>> list = missionDao.listBySql("select a.*,b.head_img,b.birth,b.user_name,b.sex as user_sex,b.country,b.invisible from tb_mission a,tb_user b where a.publish_id = b.user_id and (a.publish_id = "+userId+" or a.accept_id = "+userId+" or (a.to_id = "+userId+" and a.to <> 2)) and a.status<>5 order by create_time desc");
+		List<Map<String,Object>> list = missionDao.listBySql("select a.*,b.head_img,b.birth,b.user_name,b.sex as user_sex,b.country,b.invisible from tb_mission a,tb_user b where a.publish_id = b.user_id and (a.publish_id = "+userId+" or a.accept_id = "+userId+" or (a.to_id = "+userId+" and a.to_type <> 2)) and a.status<>5 order by create_time desc");
 //		WherePrams where = new WherePrams();
 //		where.orStart();
 //		where.or("publish_id", C.EQ, userId);

@@ -215,7 +215,7 @@ public class WxPayController {
 				String transaction_id = (String) packageParams
 						.get("transaction_id"); // 微信支付订单号
 				
-				WalletRecord walletRecord = walletRecordService.findWallerOrderByRecordSN(out_trade_no);
+				WalletRecord walletRecord = walletRecordService.getWallerOrderByRecordSN(out_trade_no);
 				//Map<String, Object> walletRecordMap = list.get(0);
 				Double money =  walletRecord.getMoney();
 				int pay_status =  walletRecord.getPay_status();
@@ -235,6 +235,7 @@ public class WxPayController {
 							+ "</xml> ";
 
 					walletRecordService.editWalletOrderPayStatus(out_trade_no,Constants.PAY_STATUS_FAIL);
+					redPacketService.editRedPacketPayStatus(out_trade_no,Constants.PAY_STATUS_FAIL);
 				} else {
 					if (Constants.PAY_STATUS_WAIT == pay_status) {// 支付的价格
 						// 订单状态的修改。根据实际业务逻辑执行
@@ -246,26 +247,24 @@ public class WxPayController {
 							//微信发红包成功，更新支付状态，更新log
 							boolean i = walletRecordService.editUserWalletPayElse(out_trade_no,from_uid,Constants.LOG_AWARD_REDPACKET,money,fee);
 							if(true == i){
+								//更新红包支付状态
+								redPacketService.editRedPacketPayStatus(out_trade_no,Constants.PAY_STATUS_SUCCESS);
 								//判断to类型是群发还是个人红包
 								RedPacket redPacket = redPacketService.getRedPacketByRecordSN(out_trade_no);
 								User fromUser = userService.getUserById(redPacket.getPublish_id());
 								//个人,直接获取个人Id并发送至环信
-								if(Constants.TO_TYPE_PRIVATE == redPacket.getTo()){
+								if(Constants.TO_TYPE_PRIVATE == redPacket.getTo_type()){
 									User toUser = userService.getUserById(redPacket.getTo_id());
 
-									ImUtils.sendTextMessage("users", new String[]{toUser.getUser_name()}, "WtwdMissionTxt:好友"+fromUser.getNick_name()+"发布了一个任务，点击查看:"+redPacket.getRedpacket_id());
-								}else if (Constants.TO_TYPE_GROUP == redPacket.getTo()){
+									ImUtils.sendTextMessage("users", new String[]{toUser.getUser_name()}, "WtwdRedPacketTxt:好友"+fromUser.getNick_name()+"发布了一个任务，点击查看:"+redPacket.getRedpacket_id());
+									ImUtils.sendTextMessage("users", new String[]{fromUser.getUser_name()}, "WtwdRedPacketTxt:" + fromUser.getNick_name() + "发布了一个红包，点击查看:" + redPacket.getRedpacket_id());
+								}else if (Constants.TO_TYPE_GROUP == redPacket.getTo_type()){
 									//群发，获取群成员的名称，并发送
 									Group group = groupService.getGroupById(redPacket.getTo_id());
 									if(group != null) {
-										ImUtils.sendTextMessage("chatgroups", new String[]{group.getIm_group_id()}, "WtwdMissionTxt:好友"+fromUser.getNick_name()+"发布了一个任务，点击查看:"+redPacket.getRedpacket_id());
+										ImUtils.sendTextMessage("chatgroups", new String[]{group.getIm_group_id()}, "WtwdRedPacketTxt:好友"+fromUser.getNick_name()+"发布了一个任务，点击查看:"+redPacket.getRedpacket_id());
 									}
 								}
-
-
-
-								//通过环信发送数据
-								// ImUtils.sendTextMessage("users", userNames.split(","), "WtwdMissionTxt:好友"+user.getUser_name()+"发布了一个任务，点击查看:"+mission2.getMission_id());
 							}
 						}else if(Constants.ORDER_TYPE_TASK == type){
 
@@ -274,7 +273,7 @@ public class WxPayController {
 							if(true == tag){
 								Mission mission = missionService.getMissionByRecordSN(out_trade_no);
 								User user = userService.getUserById(mission.getPublish_id());
-						    	if(mission.getTo() == 0){//如果发给所有人
+						    	if(mission.getTo_type() == 0){//如果发给所有人
 							    	List<Map<String,Object>> fList = friendService.getUserFriends(mission.getPublish_id());							    	
 							    	if(fList.size() > 20) {//每次只能发送给20个人
 							    		int count = fList.size() / 20;
@@ -312,7 +311,7 @@ public class WxPayController {
 							    		}
 							    		ImUtils.sendTextMessage("users", userNames.split(","), "WtwdMissionTxt:好友"+user.getNick_name()+"发布了一个任务，点击查看:"+mission.getMission_id());
 							    	}
-							    }else if(mission.getTo() == 1) {//发给个人
+							    }else if(mission.getTo_type() == 1) {//发给个人
 							    	User toUser = userService.getUserById(mission.getTo_id());
 							    	if(toUser != null) {
 							    		ImUtils.sendTextMessage("users", new String[]{toUser.getUser_name()}, "WtwdMissionTxt:好友"+user.getNick_name()+"发布了一个任务，点击查看:"+mission.getMission_id());

@@ -7,11 +7,13 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.award.sy.entity.Location;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.award.core.util.JsonUtils;
@@ -114,4 +116,33 @@ public class NearbyOpenController {
 		return returnStr;
 	}
 
+	@RequestMapping(value = "/open/uploadLocation", produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String uploadLoaction(@RequestParam String userId, @RequestParam String lat,@RequestParam String lng){
+		if(StringUtils.isBlank(userId)||StringUtils.isBlank(lat)||StringUtils.isBlank(lng)){
+			return JsonUtils.writeJson(0, 0, "参数为空");
+		}
+		User user = userService.getUserById(Long.parseLong(userId));
+		if(null == user){
+			return JsonUtils.writeJson(0, 4, "用户不存在");
+		}
+		Location location = locationService.getLocationByUserId(Long.parseLong(userId));
+		int i = 0;
+		if(null == location){
+			Location newLocation = new Location();
+			newLocation.setLng(Double.parseDouble(lng));
+			newLocation.setLat(Double.parseDouble(lat));
+			newLocation.setUser_id(Long.parseLong(userId));
+			i = locationService.addLocation(newLocation);
+		}else{
+			location.setLng(Double.parseDouble(lng));
+			location.setLat(Double.parseDouble(lat));
+			i = locationService.editLocation(location);
+		}
+		if(0 < i){
+			return JsonUtils.writeJson("设置成功", 1);
+		}else{
+			return JsonUtils.writeJson(0, 43, "定位上传失败");
+		}
+	}
 }

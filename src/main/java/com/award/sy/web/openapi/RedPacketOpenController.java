@@ -54,7 +54,7 @@ public class RedPacketOpenController {
      */
     @RequestMapping(value = "/open/getRedPacket", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String getRedPacket(@RequestParam String userId,
+    public String userGetRedPacket(@RequestParam String userId,
                                @RequestParam String redpacketId) {
         String returnStr = JsonUtils.writeJson(0, 0, "参数为空");
         if (StringUtils.isBlank(userId) || StringUtils.isBlank(redpacketId)) {
@@ -70,7 +70,8 @@ public class RedPacketOpenController {
         if (null == redPacket) {
             return JsonUtils.writeJson(0, 16, "红包id不存在");
         }
-        WalletRecord walletRecord = walletRecordService.findWallerOrderByRecordSN(redPacket.getRecord_sn());
+        WalletRecord walletRecord = walletRecordService.getWallerOrderByRecordSN(redPacket.getRecord_sn());
+        System.out.println("wallerTecord "+walletRecord.toString());
         if (walletRecord.getMoney().compareTo(redPacket.getMoney()) != 0) {
             return JsonUtils.writeJson(0, 18, "红包领取失败");
         }
@@ -175,7 +176,7 @@ public class RedPacketOpenController {
                 if (null == record_sn) {
                     return JsonUtils.writeJson(0, 22, "红包发送失败");
                 }
-                //生成红包
+                //生成红包，待支付
                 boolean isRedPacketSuccess = redPacketService.addRedpacketRecord(record_sn, userId, money, to, to_id);
                 if (false == isRedPacketSuccess) {
                     return JsonUtils.writeJson(0, 22, "红包发送失败");
@@ -187,19 +188,23 @@ public class RedPacketOpenController {
                 if (false == isWalletSuccess) {
                     return JsonUtils.writeJson(0, 22, "红包发送失败");
                 } else {
-
+                    System.out.println(record_sn);
+                    //修改红包支付状态
+                    redPacketService.editRedPacketPayStatus(record_sn,Constants.PAY_STATUS_SUCCESS);
                     //判断to类型是群发还是个人红包
                     RedPacket redPacket = redPacketService.getRedPacketByRecordSN(record_sn);
                     User fromUser = userService.getUserById(user_id);
                     //个人,直接获取个人Id并发送至环信
-                    if (Constants.TO_TYPE_PRIVATE == redPacket.getTo()) {
+                    if (Constants.TO_TYPE_PRIVATE == redPacket.getTo_type()) {
                         User toUser = userService.getUserById(redPacket.getTo_id());
-                        ImUtils.sendTextMessage("users", new String[]{toUser.getUser_name()}, "WtwdMissionTxt:好友" + fromUser.getUser_name() + "发布了一个红包，点击查看:" + redPacket.getRedpacket_id());
-                    } else if (Constants.TO_TYPE_GROUP == redPacket.getTo()) {
+                        ImUtils.sendTextMessage("users", new String[]{toUser.getUser_name()}, "WtwdRedPacketTxt:好友" + fromUser.getNick_name()  + "发布了一个红包，点击查看:" + redPacket.getRedpacket_id());
+                        ImUtils.sendTextMessage("users", new String[]{fromUser.getUser_name()}, "WtwdRedPacketTxt:" + fromUser.getNick_name()  + "发布了一个红包，点击查看:" + redPacket.getRedpacket_id());
+                    } else if (Constants.TO_TYPE_GROUP == redPacket.getTo_type()) {
                         //群发，获取群成员的名称，并发送
                         Group group = groupService.getGroupById(redPacket.getTo_id());
                         if (null !=group) {
-                            ImUtils.sendTextMessage("chatgroups", new String[]{group.getIm_group_id()}, "WtwdMissionTxt:好友" + fromUser.getUser_name() + "发布了一个红包，点击查看:" + redPacket.getRedpacket_id());
+                            ImUtils.sendTextMessage("chatgroups", new String[]{group.getIm_group_id()}, "WtwdRedPacketTxt:好友" + fromUser.getNick_name()  + "发布了一个红包，点击查看:" + redPacket.getRedpacket_id());
+
                         }
                     }
                     return JsonUtils.writeJson("红包发送成功", 1);

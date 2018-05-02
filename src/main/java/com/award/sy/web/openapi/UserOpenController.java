@@ -6,12 +6,15 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.award.sy.entity.Wallet;
+import com.award.sy.service.WalletService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +41,9 @@ public class UserOpenController {
     @Autowired
     private UserIndexImgService userIndexImgService;
 
+    @Autowired
+    private WalletService walletService;
+
     /**
      * 设置user信息
      * <p>Title: editUser</p>
@@ -51,7 +57,7 @@ public class UserOpenController {
      * @param sex
      * @return
      */
-    @RequestMapping(value = "/open/editUser", produces = "text/html;charset=UTF-8")
+    @RequestMapping(value = "/open/editUser", produces = "text/html;charset=UTF-8",method = RequestMethod.POST)
     @ResponseBody
     public String editUser(@RequestParam String userId, @RequestParam String headImg, @RequestParam String userName, @RequestParam String birth, @RequestParam String height, @RequestParam String sex, HttpServletRequest request) {
         String returnStr = JsonUtils.writeJson(0, 0, "参数为空");
@@ -63,31 +69,32 @@ public class UserOpenController {
         if (null == user) {
             return JsonUtils.writeJson(0, 4, "用户不存在");
         }
-        String path = Constants.HEAD_IMG_PATH;
         //获取绝对路径
-        String uploadPath = request.getSession().getServletContext().getRealPath(path);
-        File file = new File(uploadPath);
+        String httpPath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/";
+
+        String filePathName= request.getSession().getServletContext().getRealPath("/")+"/"+Constants.HEAD_IMG_PATH;;//存放路径
+        System.out.println(filePathName);
+        File file = new File(filePathName);
         if (!file.exists()) {
             file.mkdirs();
         }
-
+        // System.out.println(filePathName);
         String fileName = System.currentTimeMillis() + String.valueOf((int) ((Math.random() * 9 + 1) * 100000)) + ".jpg";
-        boolean isSuccess = FileUtil.CreateImgBase64(headImg, path + fileName);
+        boolean isSuccess = FileUtil.CreateImgBase64(headImg, filePathName + fileName);
         if (!isSuccess) {
             return JsonUtils.writeJson(0, 24, "图片上传失败");
         }
         user.setBirth(birth);
-        user.setHead_img(uploadPath + fileName);
+        user.setHead_img(httpPath+Constants.HEAD_IMG_PATH  + fileName);
         user.setHeight(Integer.parseInt(height));
         user.setSex(Integer.parseInt(sex));
         user.setUser_id(user_id);
         user.setNick_name(userName);
         int i = userService.editUser(user);
-        if (1 < i) {
+        if (0 < i) {
             return JsonUtils.writeJson("修改成功", 1);
-        } else {
-            return JsonUtils.writeJson(0, 0, "修改失败");
         }
+        return JsonUtils.writeJson(0, 0, "修改失败");
     }
 
     /**
@@ -100,27 +107,56 @@ public class UserOpenController {
      * @param sex
      * @param type
      * @param phone
-     * @param open_id
+     * @param openId
      * @param request
      * @return
      */
-    @RequestMapping(value = "/open/registUser", produces = "text/html;charset=UTF-8")
+    @RequestMapping(value = "/open/registUser", produces = "text/html;charset=UTF-8",method = RequestMethod.POST)
     @ResponseBody
-    public String registUser(@RequestParam String headImg, @RequestParam String userName, @RequestParam String birth, @RequestParam String height, @RequestParam String sex, @RequestParam String type, @RequestParam(required = false) String phone, @RequestParam(required = false) String open_id, HttpServletRequest request) {
+    public String registUser(@RequestParam String headImg, @RequestParam String userName, @RequestParam String birth, @RequestParam String height, @RequestParam String sex, @RequestParam String type, @RequestParam(required = false) String phone, @RequestParam(required = false) String openId, HttpServletRequest request) {
         String returnStr = JsonUtils.writeJson(0, 0, "参数为空");
         if (StringUtils.isBlank(headImg) || StringUtils.isBlank(userName) || StringUtils.isBlank(birth) || StringUtils.isBlank(height) || StringUtils.isBlank(sex)) {
             return returnStr;
         }
-        String path = Constants.HEAD_IMG_PATH;
+
+
+        if(Constants.LOGIN_TYPE_PHONE == Integer.parseInt(type)){
+            //通过手机查找用户是否存在
+            if(StringUtils.isBlank(phone)){
+                return JsonUtils.writeJson(0, 0, "参数为空");
+            }
+            User user = userService.getUserByUserName(phone);
+            if(null != user){
+                return JsonUtils.writeJson(1, 4,"用户已存在");
+            }
+        }else if(Constants.LOGIN_TYPE_WECHAT == Integer.parseInt(type)){
+            //判断参数
+            if(StringUtils.isBlank(openId)){
+                return JsonUtils.writeJson(0, 0, "参数为空");
+            }
+            User user = userService.getUserByUserName(openId);
+            if(null != user){
+                return JsonUtils.writeJson(0,4,"用户已存在");
+            }
+            //查询user是否存在
+            User wechatUser = userService.getUserByOpenId(openId);
+            if(null != wechatUser){
+                return JsonUtils.writeJson(0,40,"微信已被绑定");
+            }
+        }
+
         //获取绝对路径
-        String uploadPath = request.getSession().getServletContext().getRealPath(path);
-        File file = new File(uploadPath);
+        String httpPath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/";
+
+        String filePathName= request.getSession().getServletContext().getRealPath("/")+"/"+Constants.HEAD_IMG_PATH;;//存放路径
+        System.out.println(filePathName);
+        File file = new File(filePathName);
         if (!file.exists()) {
             file.mkdirs();
         }
-
+       // System.out.println(filePathName);
         String fileName = System.currentTimeMillis() + String.valueOf((int) ((Math.random() * 9 + 1) * 100000)) + ".jpg";
-        boolean isSuccess = FileUtil.CreateImgBase64(headImg, path + fileName);
+        boolean isSuccess = FileUtil.CreateImgBase64(headImg, filePathName + fileName);
         if (!isSuccess) {
             return JsonUtils.writeJson(0, 24, "图片上传失败");
         }
@@ -129,7 +165,7 @@ public class UserOpenController {
         if (Constants.LOGIN_TYPE_PHONE == login_type) {
             addImSuccess = ImUtils.authRegister(phone, "123456", phone);
         } else if (Constants.LOGIN_TYPE_WECHAT == login_type) {
-            addImSuccess = ImUtils.authRegister(open_id, "123456", open_id);
+            addImSuccess = ImUtils.authRegister(openId, "123456", openId);
         } else {
             return JsonUtils.writeJson(0, 0, "参数为空");
         }
@@ -138,24 +174,24 @@ public class UserOpenController {
         }
         User user = new User();
         user.setBirth(birth);
-        user.setHead_img(Constants.CONTEXT_PATH+uploadPath + fileName);
+        user.setHead_img(httpPath+Constants.HEAD_IMG_PATH + fileName);
         user.setHeight(Integer.parseInt(height));
         user.setSex(Integer.parseInt(sex));
-        //user.setUser_id(user_id);
         user.setNick_name(userName);
-
+        User userResult = null;
         if (Constants.LOGIN_TYPE_PHONE == login_type) {
             user.setUser_name(phone);
             userService.addNewUser(user);
+            userResult = userService.getUserByUserName(phone);
         } else if (Constants.LOGIN_TYPE_WECHAT == login_type) {
-            user.setOpen_id(open_id);
-            user.setUser_name(open_id);
+            user.setOpen_id(openId);
+            user.setUser_name(openId);
             userService.addNewUser(user);
+            userResult = userService.getUserByUserName(openId);
         } else {
             return JsonUtils.writeJson(0, 0, "参数为空");
         }
-
-        User userResult = userService.getUserByUserName(open_id);
+        walletService.addNewUser(userResult.getUser_id());
         return JsonUtils.writeJson(1, "请求成功", userResult, "object");
 
     }
@@ -182,12 +218,14 @@ public class UserOpenController {
         }
         String path = Constants.USER_IMG_PATH;
         //获取绝对路径
-        String uploadPath = request.getSession().getServletContext().getRealPath("/");
+       String uploadPath = request.getSession().getServletContext().getRealPath("/");
+       // String uploadPath = "D:\\32+4";
         log.info("uploadPath路径：" + uploadPath);
         File file = new File(uploadPath + Constants.USER_IMG_PATH);
         if (!file.exists()) {
             file.mkdirs();
         }
+       // String newimagepath=headImg.replaceAll("data:image/jpeg;base64,", "");
         String fileName = System.currentTimeMillis() + String.valueOf((int) ((Math.random() * 9 + 1) * 100000)) + ".jpg";
         log.info("fileName路径：" + fileName);
         boolean isSuccess = FileUtil.CreateImgBase64(headImg, uploadPath + Constants.USER_IMG_PATH + fileName);

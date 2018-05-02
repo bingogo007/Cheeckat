@@ -2,6 +2,7 @@ package com.award.sy.web.openapi;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -176,5 +177,21 @@ public class WalletController {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("balance",wallet.getMoney().doubleValue());
 		return JsonUtils.writeJson(1, "请求成功", result, "object");
+	}
+
+	/**
+	 * 查询user余额变动
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/open/getBalanceDetail",produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getBalanceDetail(@RequestParam String userId){
+		if(StringUtils.isBlank(userId)){
+			return JsonUtils.writeJson(0, 0, "参数错误");
+		}
+
+		List<Map<String,Object>> list = walletLogService.getWalletLogByUserId(Long.parseLong(userId));
+		return JsonUtils.writeJson(1, "请求成功", list, "object");
 	}
 }

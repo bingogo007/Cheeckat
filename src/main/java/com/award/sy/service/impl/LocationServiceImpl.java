@@ -59,6 +59,13 @@ public class LocationServiceImpl implements LocationService{
 	}
 
 	@Override
+	public Location getLocationByUserId(long l) {
+		WherePrams wherePrams = new WherePrams();
+		wherePrams.and("user_id",C.EQ,l);
+		return locationDao.get(wherePrams);
+	}
+
+	@Override
 	public List<Map<String,Object>> getLocationByLatLng(Map<String,double[]> map,long userId) {
 		List<Map<String,Object>> list = locationDao.listBySql("select a.*,b.head_img,b.birth,b.user_name,b.sex,b.country,b.invisible from tb_location a, tb_user b where a.user_id = b.user_id and a.user_id <> "+userId+" and a.lat > "+ map.get("rightBottomPoint")[0]+" and a.lat < "+ map.get("leftTopPoint")[0] + " and a.lng > "+map.get("leftTopPoint")[1]+" and a.lng < "+map.get("rightBottomPoint")[1]);
 		return list;

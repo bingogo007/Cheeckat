@@ -79,7 +79,7 @@ public interface GroupDetailsService {
 	 * @param userId
 	 * @return
 	 */
-	int deleteUserAdminFromGroup(long userId,long groupId);
+	String deleteUserAdminFromGroup(long userId,long groupId);
 
 	/**
 	 * 判断用户是否是和权限一致

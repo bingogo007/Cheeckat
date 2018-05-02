@@ -1,6 +1,9 @@
 package com.award.core.util;
 
+import com.award.sy.common.DateUtil;
+
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class RegistTest {
 	
@@ -23,6 +26,8 @@ public class RegistTest {
 		if(b> 0 & b< 200){
 			System.out.println(true);
 		}
+
+		System.out.println(DateUtil.getDayBeginTime(System.currentTimeMillis()));
 
 	}
 	

@@ -82,6 +82,8 @@ public class RedPacketServiceImpl implements RedPacketService {
 		redPacket.setRecord_sn(record_sn);
 		redPacket.setMoney(Double.parseDouble(money));
 		redPacket.setCreate_time(DateUtil.getNowTime());
+		redPacket.setTo_type(Integer.parseInt(to));
+		redPacket.setTo_id(Long.parseLong(to_id));
 		int i = redPacketDao.addLocal(redPacket);
 		return 0 < i;
 	}
@@ -102,6 +104,30 @@ public class RedPacketServiceImpl implements RedPacketService {
 		WherePrams where = new WherePrams();
 		where.and("record_sn",C.EQ,out_trade_no);
 		return redPacketDao.get(where);
+	}
+
+	/**
+	 * 修改红包支付状态
+	 * @param record_sn
+	 * @param pay_status
+	 * @return
+	 */
+	@Override
+	public int editRedPacketPayStatus(String record_sn, int pay_status) {
+		WherePrams where = new WherePrams();
+		where.and("record_sn",C.EQ,record_sn);
+		RedPacket redPacket = new RedPacket();
+		redPacket.setPay_status(pay_status);
+		return redPacketDao.updateLocal(redPacket,where);
+	}
+
+	@Override
+	public List<RedPacket> getExpiredRedPacket() {
+		WherePrams where = new WherePrams();
+		where.and("pay_status",C.EQ,Constants.PAY_STATUS_SUCCESS);
+		where.and("status",C.EQ,0);
+		where.and("create_time",C.IXAO,DateUtil.getDayBeginDate(System.currentTimeMillis()));
+		return redPacketDao.list(where);
 	}
 
 

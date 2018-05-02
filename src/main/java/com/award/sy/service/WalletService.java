@@ -57,5 +57,10 @@ public interface WalletService {
 	boolean withdrawMoney(long userId, Double price,Wallet wallet);
 	
 	boolean refund(String record_sn,long user_id,int log_type,Double changemoney,Double money);
-	
+
+	/**
+	 * 添加新用户
+	 * @param user_id
+	 */
+	int addNewUser(Long user_id);
 }

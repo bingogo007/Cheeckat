@@ -1,5 +1,7 @@
 package com.award.sy.service.impl;
 
+import com.award.core.beans.WherePrams;
+import com.award.core.sql.where.C;
 import com.award.sy.common.DateUtil;
 import com.award.sy.dao.WalletDao;
 import com.award.sy.dao.WalletLogDao;
@@ -8,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.award.sy.service.WalletLogService;
+
+import java.util.List;
+import java.util.Map;
+
 @Service("walletLogService")
 public class WalletLogServiceImpl implements WalletLogService{
 
@@ -33,5 +39,17 @@ public class WalletLogServiceImpl implements WalletLogService{
         walletLog.setMoney(moeny);
         walletLog.setCreate_time(DateUtil.getNowTime());
         return walletLogDao.addLocal(walletLog);
+    }
+
+    /**
+     * 获取余额变动明细
+     * @param l
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getWalletLogByUserId(long l) {
+
+        List<Map<String,Object>> list = walletLogDao.listBySql("select * from tb_wallet_log where user_id = "+l+"order by create_time desc");
+        return list;
     }
 }

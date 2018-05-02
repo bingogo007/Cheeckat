@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.award.core.util.ImUtils;
+import com.award.sy.entity.Group;
 import com.award.sy.entity.GroupDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,7 @@ public class GroupOpenController {
 		if(null == list || 0 == list.size()){
 			return  JsonUtils.writeJson(1, "获取成功,无群组", null, "object");
 		}
+
 		List<Map<String,Object>> resultList = new ArrayList<>();
 		for(int i = 0;i < list.size();i++){
 			Map<String,Object> result = new HashMap<String,Object>();
@@ -91,14 +93,21 @@ public class GroupOpenController {
 		if(null == groupDetails){
 			return JsonUtils.writeJson(0, 35, "权限错误");
 		}
+		Group group = groupService.getGroupById(group_id);
+		if(null == group){
+			return JsonUtils.writeJson(1, 0, "退出失败");
+		}
+		User user = userService.getUserById(user_id);
+		if(null == user){
+			return JsonUtils.writeJson(1, 0, "退出失败");
+		}
 		List<Map<String,Object>> userList = groupDetailsService.getUserGroupDetails(group_id);
 		if(userList.size() ==  3){
+
 			//删除这个群
-
-			//ImUtils.deleteGroup()
-
 			int i = groupService.deleteGroup(group_id);
 			if(i > 0){
+				ImUtils.deleteGroup(group.getIm_group_id());
 				return  JsonUtils.writeJson(1, "退出成功", null, "object");
 			}else {
 				return JsonUtils.writeJson(1, 0, "退出失败");
@@ -107,8 +116,9 @@ public class GroupOpenController {
 			//删除用户在群中的信息
 			if(is_Admin == 1){
 				//作为管理员
-				int i = groupDetailsService.deleteUserAdminFromGroup(user_id,group_id);
-				if(i > 0){
+				String userName =  groupDetailsService.deleteUserAdminFromGroup(user_id,group_id);
+				if(null != userName){
+					ImUtils.transferAdmin(group.getIm_group_id(),userName);
 					return  JsonUtils.writeJson(1, "退出成功", null, "object");
 				}else {
 					return JsonUtils.writeJson(1, 0, "退出失败");
@@ -117,6 +127,7 @@ public class GroupOpenController {
 				//不作为管理员
 				int i = groupDetailsService.deleteUserFromGroup(user_id,group_id);
 				if(i > 0){
+					ImUtils.delSingleMember(group.getIm_group_id(),user.getUser_name());
 					return  JsonUtils.writeJson(1, "退出成功", null, "object");
 				}else {
 					return JsonUtils.writeJson(1, 0, "退出失败");
@@ -153,8 +164,7 @@ public class GroupOpenController {
 		Map<String,Object> result = new HashMap<String,Object>();
 		//获取groupId下的用户信息
 		List<Map<String,Object>> userList = groupDetailsService.getUserGroupDetails(group_id);
-		//result.put("user",userList);
-		
+
 		return JsonUtils.writeJson(1, "获取成功", userList, "object");
 	}
 

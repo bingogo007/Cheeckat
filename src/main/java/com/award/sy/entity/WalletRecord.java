@@ -21,7 +21,7 @@ public class WalletRecord extends Po{
 	private Long   wallet_record_id;//ID
 	
 	@TempField
-	private String longIdStr;				
+	private String walletRecordIdStr;
 	
 	private String record_sn;//订单号
 	
@@ -52,11 +52,11 @@ public class WalletRecord extends Po{
 	}
 
 	public String getLongIdStr() {
-		return longIdStr;
+		return walletRecordIdStr;
 	}
 
-	public void setLongIdStr(String longIdStr) {
-		this.longIdStr = longIdStr;
+	public void setLongIdStr(String walletRecordIdStr) {
+		this.walletRecordIdStr = walletRecordIdStr;
 	}
 
 	public String getRecord_sn() {
@@ -142,7 +142,7 @@ public class WalletRecord extends Po{
 	@Override
 	public String toString() {
 		return "WalletRecord [wallet_record_id=" + wallet_record_id
-				+ ", longIdStr=" + longIdStr + ", record_sn=" + record_sn
+				+ ", walletRecordIdStr=" + walletRecordIdStr + ", record_sn=" + record_sn
 				+ ", to_uid=" + to_uid + ", from_uid=" + from_uid + ", type="
 				+ type + ", money=" + money + ", pay_type=" + pay_type
 				+ ", pay_status=" + pay_status + ", pay_time=" + pay_time

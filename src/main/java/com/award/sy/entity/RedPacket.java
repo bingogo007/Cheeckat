@@ -34,9 +34,12 @@ public class RedPacket extends Po {
 
     private String accept_time;
 
-    private Integer to;
+    private Integer to_type;
 
-    private Integer to_id;
+    private Long to_id;
+
+    private Integer pay_status;
+
 
     public Long getRedpacket_id() {
         return redpacket_id;
@@ -118,20 +121,28 @@ public class RedPacket extends Po {
         this.accept_time = accept_time;
     }
 
-    public Integer getTo() {
-        return to;
+    public Integer getTo_type() {
+        return to_type;
     }
 
-    public void setTo(Integer to) {
-        this.to = to;
+    public void setTo_type(Integer to_type) {
+        this.to_type = to_type;
     }
 
-    public Integer getTo_id() {
+    public Long getTo_id() {
         return to_id;
     }
 
-    public void setTo_id(Integer to_id) {
+    public void setTo_id(Long to_id) {
         this.to_id = to_id;
+    }
+
+    public Integer getPay_status() {
+        return pay_status;
+    }
+
+    public void setPay_status(Integer pay_status) {
+        this.pay_status = pay_status;
     }
 
     @Override
@@ -147,8 +158,9 @@ public class RedPacket extends Po {
                 ", accept_id=" + accept_id +
                 ", status=" + status +
                 ", accept_time='" + accept_time + '\'' +
-                ", to=" + to +
+                ", to_type=" + to_type +
                 ", to_id=" + to_id +
+                ", pay_status=" + pay_status +
                 '}';
     }
 }

@@ -59,8 +59,6 @@ public class MissionOpenController {
 	 * 查询附近的人
 	 * 
 	 * @param request
-	 * @param query
-	 * @param model
 	 * @return
 	 */
 	@RequestMapping(value = "/open/getAllMission", produces = "text/html;charset=UTF-8")
@@ -279,7 +277,7 @@ public class MissionOpenController {
 			    	mission.setStart_time(startTime);
 			    	mission.setStatus(5);//等待微信返回支付成功
 			    	mission.setType(Integer.parseInt(type));
-			    	mission.setTo(Integer.parseInt(to));
+			    	mission.setTo_type(Integer.parseInt(to));
 			    	mission.setTo_id(Long.parseLong(toId));
 			    	mission.setRecord_sn(record_sn);
 			    	mission.setAnonymous(Integer.parseInt(anonymous));
@@ -315,7 +313,7 @@ public class MissionOpenController {
 			    	mission.setStart_time(startTime);
 			    	mission.setStatus(0);
 			    	mission.setType(Integer.parseInt(type));
-			    	mission.setTo(Integer.parseInt(to));
+			    	mission.setTo_type(Integer.parseInt(to));
 			    	mission.setTo_id(Long.parseLong(toId));
 			    	mission.setRecord_sn(record_sn);
 			    	mission.setAnonymous(Integer.parseInt(anonymous));

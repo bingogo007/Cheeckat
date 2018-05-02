@@ -44,7 +44,7 @@ public class Mission extends Po {
 	
 	private Long to_id;
 	
-	private Integer to;
+	private Integer to_type;
 	
 	public Mission() {
 		super();
@@ -220,15 +220,13 @@ public class Mission extends Po {
 	}
 
 
-	public Integer getTo() {
-		return to;
+	public Integer getTo_type() {
+		return to_type;
 	}
 
-
-	public void setTo(Integer to) {
-		this.to = to;
+	public void setTo_type(Integer to_type) {
+		this.to_type = to_type;
 	}
-
 
 	@Override
 	public String toString() {
@@ -240,7 +238,7 @@ public class Mission extends Po {
 				+ ", accept_id=" + accept_id + ", status=" + status
 				+ ", accept_time=" + accept_time + ", finish_time=" + finish_time 
 				+ ", anonymous=" + anonymous + ", to_id=" + to_id
-				+ ", record_sn=" + record_sn + ", to=" + to
+				+ ", record_sn=" + record_sn + ", to=" + to_type
 				+ "]";
 	}
 	

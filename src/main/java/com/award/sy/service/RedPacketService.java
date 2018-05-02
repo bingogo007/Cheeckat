@@ -57,4 +57,18 @@ public interface RedPacketService {
 	 * @return
 	 */
 	RedPacket getRedPacketByRecordSN(String out_trade_no);
+
+	/**
+	 *修改红包支付状态
+	 * @param record_sn
+	 * @param pay_status
+	 * @return
+	 */
+	int editRedPacketPayStatus(String record_sn, int pay_status);
+
+	/**
+	 * 获取失效的红包
+	 * @return
+	 */
+	List<RedPacket> getExpiredRedPacket();
 }

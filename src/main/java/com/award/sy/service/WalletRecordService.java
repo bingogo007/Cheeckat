@@ -17,14 +17,14 @@ public interface WalletRecordService {
 
 	/**
 	 * 通过SN查找记录
-	 * @Title:           findWallerOrderByRecordSN
+	 * @Title:           getWallerOrderByRecordSN
 	 * @Description:     TODO
 	 * @param:           @param record_sn
 	 * @param:           @return   
 	 * @return:          WalletRecord   
 	 * @throws
 	 */
-	WalletRecord findWallerOrderByRecordSN(String record_sn);
+	WalletRecord getWallerOrderByRecordSN(String record_sn);
 
 	/**
 	 * 修改记录表支付状态

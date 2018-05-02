@@ -152,6 +152,7 @@ public class Constants {
      public static final int PAY_STATUS_WAIT = 0;//等待支付
      public static final int PAY_STATUS_SUCCESS = 1;//支付成功
      public static final int PAY_STATUS_FAIL = -1;//支付失败
+	 public static final int PAY_STATUS_BACK = 2;//已退款
      
      public static final int FETCH_WAIT = 0;//未领取
      public static final int FETCH_SUCCESS = 1;//领取成功
@@ -167,8 +168,8 @@ public class Constants {
 	public static final int LOGIN_TYPE_PHONE = 1;//手机登录
 	public static final int LOGIN_TYPE_WECHAT = 2;//微信登录
 
-	//public static final String CONTEXT_PATH = "http://121.196.232.11:9883/Award/";
-	public static final String CONTEXT_PATH = "http://192.168.13.235:8080";
+	public static final String CONTEXT_PATH = "http://121.196.232.11:9883/Award";
+	//public static final String CONTEXT_PATH = "http://192.168.13.235:8080";
 	public static final String HEAD_IMG_PATH="/upload/head/image/";
 	public static final String USER_IMG_PATH="/upload/user/image/";
 

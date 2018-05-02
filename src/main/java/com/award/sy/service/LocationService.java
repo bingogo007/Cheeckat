@@ -54,4 +54,10 @@ public interface LocationService {
 	 */
 	public int removeLocation(long locationId);
 
+	/**
+	 * 通过id找到定位信息
+	 * @param l
+	 * @return
+	 */
+	Location getLocationByUserId(long l);
 }

@@ -1,9 +1,5 @@
 package com.award.sy.service.impl;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
 import com.award.sy.common.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,18 +24,18 @@ public class WalletRecordServiceImpl implements WalletRecordService{
 
 	/**
 	 * 通过record_sn查找订单
-	 * Title: findWallerOrderByRecordSN
+	 * Title: getWallerOrderByRecordSN
 	 * Description: 
 	 * @param record_sn
 	 * @return
-	 * @see com.award.sy.service.WalletRecordService#findWallerOrderByRecordSN(java.lang.String)
+	 * @see com.award.sy.service.WalletRecordService#getWallerOrderByRecordSN(java.lang.String)
 	 */
 	@Override
-	public WalletRecord findWallerOrderByRecordSN(String record_sn) {
+	public WalletRecord getWallerOrderByRecordSN(String record_sn) {
 		WherePrams where = new WherePrams();
 		where.and("record_sn", C.EQ, record_sn);
-		WalletRecord  walletRecord= walletRecordDao.get(where);
-		return walletRecord;
+
+		return walletRecordDao.get(where);
 	}
 
 	/**
